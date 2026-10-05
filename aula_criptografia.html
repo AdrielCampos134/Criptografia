@@ -422,76 +422,76 @@
   <script>
     const questions = [
       {
-        q: "Na César com chave 3, o que acontece com a letra Y?",
-        a: ["Vira B, porque o alfabeto volta ao início", "Vira Z, porque soma apenas uma posição", "É removida", "Permanece Y"],
-        correct: 0,
-        why: "Y é a posição 24. (24 + 3) mod 26 = 1, que corresponde a B."
+        q: "Na Cifra de César, usando A=0 e chave 5, qual é o resultado de X?",
+        a: ["B, porque 23 + 5 = 28 e 28 mod 26 = 2", "C, porque X ocupa a posição 23 e a contagem inclui o próprio X", "D, porque o deslocamento começa contando A como 1", "Y, porque o módulo só é usado na descriptografia"],
+        correct: 1,
+        why: "X=23. (23 + 5) mod 26 = 2. Como A=0, a posição 2 é C."
       },
       {
-        q: "Por que o módulo 26 aparece nas cifras baseadas no alfabeto?",
-        a: ["Para limitar o resultado às 26 letras e dar a volta no alfabeto", "Para criar uma senha de 26 caracteres", "Para apagar espaços", "Para inverter a mensagem"],
+        q: "Se um texto foi cifrado por César com chave 4 e começa com KHOOR, qual início aparece na descriptografia?",
+        a: ["GDKKN, subtraindo 4 de cada letra", "LOSVV, somando 4 para compensar a cifra", "HAPPY, porque KHOOR é uma palavra inglesa", "KDAAL, subtraindo a posição da letra no texto"],
         correct: 0,
-        why: "O módulo mantém o resultado entre 0 e 25, permitindo que depois do Z o cálculo retorne ao A."
+        why: "A descriptografia usa o deslocamento contrário: K→G, H→D, O→K, O→K, R→N."
       },
       {
-        q: "Qual é a principal diferença entre César e Vigenère?",
-        a: ["César usa um deslocamento fixo; Vigenère usa deslocamentos definidos por uma palavra-chave", "César troca a ordem; Vigenère só remove espaços", "Vigenère não possui chave", "Não existe diferença"],
-        correct: 0,
-        why: "A palavra-chave da Vigenère faz o deslocamento variar ao longo da mensagem."
+        q: "Na Vigenère deste projeto, qual seria o resultado de A B! usando a chave BC?",
+        a: ["B D!, porque o espaço também avança a chave", "C E!, porque B e C são deslocamentos 1 e 2 contando A como 1", "B D!, porque A+B=B e B+C=D; o espaço não consome chave", "A B!, porque Vigenère só funciona com mensagens sem espaços"],
+        correct: 2,
+        why: "A usa B como deslocamento e vira B. B usa C e vira D. O espaço é preservado e não avança a posição da chave."
       },
       {
-        q: "Na implementação estudada, um espaço na mensagem faz a posição da chave da Vigenère avançar?",
-        a: ["Não, porque somente letras A–Z são processadas", "Sim, sempre", "Somente se a chave tiver números", "Apenas durante a descriptografia"],
-        correct: 0,
-        why: "Espaços, números e pontuação são preservados e não consomem letras da chave."
+        q: "Por que uma implementação de Vigenère pode produzir resultados diferentes se uma versão conta espaços e outra não?",
+        a: ["Porque o alfabeto deixa de ter 26 letras", "Porque o alinhamento entre as letras da mensagem e as letras da chave muda", "Porque a descriptografia deixa de existir", "Porque espaços são convertidos em Z antes da cifra"],
+        correct: 1,
+        why: "Se o espaço consome uma posição, a letra seguinte recebe outra letra da chave. O alinhamento é parte da especificação do algoritmo."
       },
       {
-        q: "Por que a chave da substituição monoalfabética não pode repetir letras?",
-        a: ["Para a associação inversa ser única", "Porque o programa só aceita vogais", "Para tornar a mensagem maior", "Porque repetição sempre causa erro de sintaxe"],
+        q: "Qual chave é válida para substituição monoalfabética?",
+        a: ["QWERTYUIOPASDFGHJKLZXCVBNM", "QWERTYUIOPASDFGHJKLZXCVBNQ", "QWERTY-UIOPASDFGHJKLZXCVBNM", "QWERTYUIOPASDFGHJKLZXCVBN"],
         correct: 0,
-        why: "Se duas letras originais produzissem o mesmo símbolo, a descriptografia não saberia qual origem escolher."
+        why: "A primeira possui exatamente 26 letras A–Z e nenhuma repetição. As outras têm repetição, caractere inválido ou tamanho incorreto."
       },
       {
-        q: "O que a Rail Fence modifica principalmente?",
-        a: ["A posição das letras", "O valor de cada letra no alfabeto", "A chave da Vigenère", "O tamanho do alfabeto"],
-        correct: 0,
-        why: "Rail Fence é transposição: as letras são mantidas, mas aparecem em outra ordem."
+        q: "Se A→Q, B→W e C→E na chave da substituição, qual é a descriptografia de QWE?",
+        a: ["QWE, porque substituição não pode ser desfeita", "ABC, usando o mapa inverso", "XYZ, usando o deslocamento da chave", "CBA, porque a ordem da chave é invertida"],
+        correct: 1,
+        why: "A descriptografia consulta a associação inversa: Q volta para A, W para B e E para C."
       },
       {
-        q: "Por que descriptografar Rail Fence não é simplesmente inverter o texto?",
-        a: ["Porque é preciso reconstruir os trilhos e o zigue-zague", "Porque ela usa RSA", "Porque todas as letras são substituídas", "Porque não existe chave"],
-        correct: 0,
-        why: "A ordem original depende do padrão de passagem pelos trilhos; inverter a string não recupera esse padrão."
+        q: "Na Rail Fence com 3 trilhos, por que ABCDEF resulta em AEBDFC?",
+        a: ["Porque a cifra ordena alfabeticamente os caracteres", "Porque o padrão de trilhos é 0,1,2,1,0,1; lendo cada trilho, temos AE, BDF e C", "Porque cada letra recebe deslocamento 3", "Porque a mensagem é invertida duas vezes"],
+        correct: 1,
+        why: "O zigue-zague coloca A e E no primeiro trilho, B/D/F no segundo e C no terceiro. A leitura por trilhos forma AEBDFC."
       },
       {
-        q: "O que deve acontecer ao criptografar e depois descriptografar com a mesma chave correta?",
-        a: ["O texto original deve ser recuperado", "O texto deve ficar duas vezes maior", "A mensagem deve ser apagada", "A chave deve mudar automaticamente"],
-        correct: 0,
-        why: "A descriptografia é a operação inversa e deve desfazer a transformação."
+        q: "Qual é o primeiro raciocínio necessário para descriptografar uma Rail Fence?",
+        a: ["Trocar cada letra por seu número no alfabeto", "Inverter todos os caracteres da string", "Descobrir quantas posições pertencem a cada trilho antes de redistribuir o texto", "Repetir a palavra-chave até o fim"],
+        correct: 2,
+        why: "É preciso reconstruir o desenho do zigue-zague e as quantidades de posições por trilho antes de recolocar as letras."
       },
       {
-        q: "Qual alternativa descreve melhor uma cifra?",
-        a: ["Uma transformação reversível usando uma chave", "Um arquivo de imagem", "Uma função que sempre destrói a mensagem", "Um sistema exclusivo para senhas"],
+        q: "Qual propriedade permite distinguir substituição de transposição?",
+        a: ["Na transposição, os símbolos originais permanecem os mesmos e apenas sua ordem muda", "Na substituição, sempre há uma palavra-chave; na transposição, nunca há chave", "A transposição sempre aumenta o tamanho da mensagem", "A substituição só pode trabalhar com números"],
         correct: 0,
-        why: "Cifras transformam e permitem recuperar o texto quando a chave e o método corretos estão disponíveis."
+        why: "Substituição altera os símbolos; transposição reorganiza posições. Por isso a frequência dos símbolos pode ser preservada na transposição."
       },
       {
-        q: "Se uma cifra preserva pontuação, isso significa que a pontuação está protegida criptograficamente?",
-        a: ["Não necessariamente; ela pode apenas estar sendo copiada sem alteração", "Sim, sempre", "Sim, porque pontuação tem valor de A a Z", "A pontuação vira uma chave"],
-        correct: 0,
-        why: "Preservar um caractere significa não transformá-lo. Isso é uma decisão de implementação, não uma proteção especial."
+        q: "Ao calcular (1 - 4) mod 26 para descriptografar a letra B na César, qual posição resulta?",
+        a: ["-3, porque números negativos não podem ser tratados", "3, porque o módulo é aplicado antes da subtração", "23, que corresponde a X", "25, que corresponde a Z"],
+        correct: 2,
+        why: "1-4=-3. No módulo 26, -3 equivale a 23, e a posição 23 é X."
       },
       {
-        q: "Por que as quatro cifras são consideradas históricas e inadequadas para dados atuais?",
-        a: ["Porque têm padrões e espaços de busca fracos para os padrões modernos", "Porque não usam computadores", "Porque só funcionam em papel", "Porque não podem ser descriptografadas"],
-        correct: 0,
-        why: "Elas são úteis para aprender conceitos, mas análise de frequência e tentativa de chaves podem quebrá-las."
+        q: "O que deve acontecer se a chave da Vigenère for 123-!?",
+        a: ["O programa deve usar 123 como deslocamento", "O programa deve cifrar apenas o ponto de exclamação", "A mensagem deve ser transformada usando uma chave vazia", "A validação deve rejeitar a chave, pois não há letra A–Z válida"],
+        correct: 3,
+        why: "A implementação filtra a chave para letras A–Z. Se nada sobrar, não existe deslocamento válido e ocorre erro de validação."
       },
       {
-        q: "Se o professor perguntar sobre autoria, qual é a melhor demonstração?",
-        a: ["Explicar as decisões do algoritmo e mostrar um exemplo de entrada, transformação e saída", "Dizer apenas que o programa funciona", "Ler o nome das funções sem explicar", "Falar que toda criptografia é igual"],
-        correct: 0,
-        why: "A apresentação avalia compreensão. Mostre o raciocínio: chave, transformação, inversa e tratamento dos caracteres."
+        q: "Uma cifra preserva espaços e pontuação. Qual conclusão é mais correta?",
+        a: ["Esses caracteres foram necessariamente protegidos", "Eles podem ter sido apenas copiados sem transformação; isso não torna a cifra segura", "A chave está escondida nos espaços", "A mensagem ficou impossível de quebrar"],
+        correct: 1,
+        why: "Preservar caracteres é uma decisão de implementação e pode até revelar o formato da mensagem. Não é uma garantia de segurança."
       }
     ];
 
