@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08111f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Aula de Criptografia Clássica</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: rgba(17, 31, 53, .88);
+      --panel-2: #142642;
+      --text: #edf5ff;
+      --muted: #a9bad2;
+      --cyan: #62e6ff;
+      --purple: #b99cff;
+      --green: #62e6a7;
+      --yellow: #ffd166;
+      --red: #ff7b8f;
+      --line: rgba(180, 210, 255, .15);
+      --shadow: 0 20px 60px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(98, 230, 255, .16), transparent 27rem),
+        radial-gradient(circle at 90% 8%, rgba(185, 156, 255, .15), transparent 25rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: auto; }
+    header { padding: 72px 0 34px; }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--cyan);
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+    .eyebrow::before { content: "◆"; font-size: .65rem; }
+    h1, h2, h3 { line-height: 1.12; margin: 0 0 14px; }
+    h1 { max-width: 850px; font-size: clamp(2.5rem, 7vw, 5.5rem); letter-spacing: -.06em; }
+    h2 { font-size: clamp(1.7rem, 4vw, 2.7rem); }
+    h3 { font-size: 1.25rem; }
+    p { color: var(--muted); margin: 0 0 14px; }
+    strong { color: var(--text); }
+    code, .formula {
+      color: var(--cyan);
+      background: rgba(98, 230, 255, .09);
+      border: 1px solid rgba(98, 230, 255, .18);
+      border-radius: 8px;
+      padding: 2px 7px;
+      font-family: "Cascadia Code", Consolas, monospace;
+    }
+    .lead { max-width: 780px; font-size: 1.17rem; }
+    .notice {
+      margin-top: 26px;
+      border-left: 4px solid var(--yellow);
+      padding: 15px 18px;
+      background: rgba(255, 209, 102, .08);
+      border-radius: 0 14px 14px 0;
+      color: #ffeab0;
+    }
+
+    nav {
+      position: sticky;
+      top: 12px;
+      z-index: 5;
+      margin: 18px 0 42px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(8, 17, 31, .78);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      backdrop-filter: blur(16px);
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: .9rem;
+    }
+    nav a:hover { color: var(--text); background: var(--panel-2); }
+    section { margin: 72px 0; scroll-margin-top: 90px; }
+    .section-kicker { color: var(--purple); font-weight: 800; margin-bottom: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: linear-gradient(145deg, rgba(20, 38, 66, .9), rgba(13, 25, 44, .9));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card.accent-cyan { border-top: 3px solid var(--cyan); }
+    .card.accent-purple { border-top: 3px solid var(--purple); }
+    .card.accent-green { border-top: 3px solid var(--green); }
+    .card.accent-yellow { border-top: 3px solid var(--yellow); }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: var(--muted);
+      font-size: .8rem;
+      margin-bottom: 12px;
+    }
+    .example {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #091524;
+      border: 1px solid rgba(255,255,255,.08);
+      font-family: "Cascadia Code", Consolas, monospace;
+      color: #dceaff;
+      overflow-x: auto;
+    }
+    .example .key { color: var(--yellow); }
+    .example .good { color: var(--green); }
+    .example .bad { color: var(--red); }
+    .step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      align-items: start;
+      margin: 18px 0;
+    }
+    .number {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #08111f;
+      font-weight: 900;
+    }
+    .compare { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .compare th, .compare td { text-align: left; border-bottom: 1px solid var(--line); padding: 13px 10px; vertical-align: top; }
+    .compare th { color: var(--cyan); font-size: .86rem; text-transform: uppercase; letter-spacing: .06em; }
+    .mini-rule { height: 1px; background: var(--line); margin: 22px 0; }
+    .question-box { margin-top: 20px; padding: 18px; background: rgba(185, 156, 255, .08); border: 1px solid rgba(185, 156, 255, .2); border-radius: 15px; }
+    .question-box strong { color: var(--purple); }
+    .quiz-shell { background: linear-gradient(145deg, #111f38, #0a1728); border: 1px solid rgba(98, 230, 255, .25); border-radius: 28px; padding: clamp(20px, 5vw, 42px); box-shadow: var(--shadow); }
+    .quiz-top { display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .progress { height: 9px; background: #07111e; border-radius: 999px; overflow: hidden; margin: 16px 0 28px; }
+    #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width .3s ease; }
+    .score { color: var(--yellow); font-weight: 800; }
+    #question-text { font-size: clamp(1.2rem, 2.5vw, 1.65rem); color: var(--text); }
+    .options { display: grid; gap: 10px; margin: 20px 0; }
+    .option {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: left;
+      color: var(--text);
+      background: rgba(255,255,255,.035);
+      cursor: pointer;
+      font: inherit;
+      transition: transform .15s, border-color .15s, background .15s;
+    }
+    .option:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--cyan); background: rgba(98, 230, 255, .1); }
+    .option.correct { border-color: var(--green); background: rgba(98, 230, 167, .14); }
+    .option.wrong { border-color: var(--red); background: rgba(255, 123, 143, .13); }
+    .option:disabled { cursor: default; }
+    .feedback { min-height: 68px; margin: 14px 0; color: var(--muted); }
+    .feedback.ok { color: var(--green); }
+    .feedback.no { color: #ffb6c2; }
+    button.next, button.restart {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #07111d;
+      font-weight: 900;
+      cursor: pointer;
+      font: inherit;
+    }
+    button.next:disabled { opacity: .4; cursor: not-allowed; }
+    #result { text-align: center; padding: 20px 0 4px; }
+    #result h3 { font-size: 2rem; color: var(--green); }
+    .hidden { display: none; }
+    footer { color: var(--muted); text-align: center; padding: 25px 0 65px; font-size: .9rem; }
+    .mobile-only { display: none; }
+    .pocket-list { display: grid; gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
+    .pocket-list li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; color: var(--muted); }
+    .pocket-list b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 9px; background: rgba(98,230,255,.12); color: var(--cyan); font-size: .8rem; }
+    .presentation-script { border-left: 3px solid var(--green); padding: 14px 16px; background: rgba(98,230,167,.07); border-radius: 0 14px 14px 0; color: #d9ffea; }
+    @media (max-width: 760px) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
+      header { padding: 38px 0 26px; }
+      h1 { font-size: clamp(2.35rem, 13vw, 4rem); }
+      .lead { font-size: 1.03rem; }
+      section { margin: 52px 0; scroll-margin-top: 78px; }
+      nav { margin: 10px -2px 30px; padding: 8px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      nav::-webkit-scrollbar { display: none; }
+      nav a { flex: 0 0 auto; min-height: 42px; display: inline-flex; align-items: center; }
+      .card { padding: 19px; border-radius: 18px; }
+      .example { font-size: .86rem; white-space: pre-wrap; word-break: break-word; }
+      .step { grid-template-columns: 34px 1fr; gap: 10px; }
+      .number { width: 32px; height: 32px; border-radius: 10px; }
+      .option { min-height: 58px; padding: 15px; }
+      button.next, button.restart { min-height: 50px; width: 100%; }
+      .quiz-shell { padding: 19px; border-radius: 21px; }
+      .quiz-top { align-items: flex-start; }
+      .mobile-only { display: block; }
+      .pocket-list li { font-size: .95rem; }
+      .grid, .grid.three { grid-template-columns: 1fr; }
+      nav { top: 6px; }
+      .compare { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header id="inicio">
+      <div class="eyebrow">Aula de revisão</div>
+      <h1>Criptografia clássica sem decorar no escuro.</h1>
+      <p class="lead">Aprenda o raciocínio por trás das quatro cifras da atividade, entenda as perguntas mais difíceis e teste seu conhecimento em um quiz no final.</p>
+      <div class="notice"><strong>Como estudar:</strong> leia uma seção, tente explicar o conceito com suas próprias palavras e só depois confira o quadro “resposta de apresentação”.</div>
+    </header>
+
+    <nav aria-label="Navegação da aula">
+      <a href="#base">Base</a>
+      <a href="#cesar">César</a>
+      <a href="#vigenere">Vigenère</a>
+      <a href="#substituicao">Substituição</a>
+      <a href="#rail">Rail Fence</a>
+      <a href="#perguntas">Perguntas difíceis</a>
+      <a href="#bolso">Revisão rápida</a>
+      <a href="#quiz">Quiz</a>
+    </nav>
+
+    <main>
+      <section id="base">
+        <div class="section-kicker">01 · A ideia central</div>
+        <h2>O que o programa precisa fazer?</h2>
+        <p>Ele transforma uma mensagem legível, chamada <strong>texto claro</strong>, em uma mensagem aparentemente sem sentido, chamada <strong>texto cifrado</strong>. A transformação usa uma <strong>chave</strong>. Depois, uma operação inversa usa essa chave para recuperar o texto original.</p>
+
+        <div class="grid three">
+          <article class="card accent-cyan">
+            <span class="tag">Entrada</span>
+            <h3>Texto claro</h3>
+            <p>A mensagem original que qualquer pessoa consegue ler.</p>
+            <div class="example">ATAQUE AO AMANHECER</div>
+          </article>
+          <article class="card accent-purple">
+            <span class="tag">Segredo</span>
+            <h3>Chave</h3>
+            <p>O número, palavra ou configuração usada para alterar a mensagem.</p>
+            <div class="example"><span class="key">CÉSAR: 3</span></div>
+          </article>
+          <article class="card accent-green">
+            <span class="tag">Saída</span>
+            <h3>Texto cifrado</h3>
+            <p>O resultado transformado, que deve ser revertido com a mesma chave.</p>
+            <div class="example"><span class="good">DWDTXH DR DPDQKHFHU</span></div>
+          </article>
+        </div>
+
+        <div class="card accent-yellow" style="margin-top:18px">
+          <h3>Alfabeto como números</h3>
+          <p>Para fazer contas, o programa pode representar cada letra por uma posição:</p>
+          <div class="example">A=0 · B=1 · C=2 · ... · X=23 · Y=24 · Z=25</div>
+          <p style="margin-top:14px">O <strong>módulo 26</strong> faz o alfabeto “dar a volta”. Por exemplo, <span class="formula">(24 + 3) mod 26 = 1</span>, então Y deslocado 3 posições vira B.</p>
+        </div>
+      </section>
+
+      <section id="cesar">
+        <div class="section-kicker">02 · Deslocamento</div>
+        <h2>Cifra de César</h2>
+        <div class="grid">
+          <article class="card accent-cyan">
+            <h3>Como pensar</h3>
+            <p>A chave é um número. Todas as letras recebem o mesmo deslocamento.</p>
+            <div class="example">Chave 3:<br>A → D &nbsp; B → E &nbsp; X → A</div>
+            <p style="margin-top:14px"><strong>Criptografar:</strong> soma a chave. <strong>Descriptografar:</strong> subtrai a chave.</p>
+          </article>
+          <article class="card accent-purple">
+            <h3>Resposta de apresentação</h3>
+            <p>“A César é uma substituição por deslocamento fixo. Como o alfabeto tem 26 posições, usamos módulo 26 para continuar no início quando passamos do Z. A descriptografia aplica o deslocamento contrário.”</p>
+            <div class="question-box"><strong>Pegadinha:</strong> com chave 3, X não vira algo depois do Z; ele volta para A.</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="vigenere">
+        <div class="section-kicker">03 · Vários deslocamentos</div>
+        <h2>Cifra de Vigenère</h2>
+        <div class="grid">
+          <article class="card accent-cyan">
+            <h3>A chave vira uma sequência</h3>
+            <p>Cada letra da palavra-chave representa um deslocamento. A chave é repetida até acompanhar a mensagem.</p>
+            <div class="example">Mensagem: <strong>ATAQUE</strong><br>Chave: &nbsp;&nbsp;&nbsp;<span class="key">CHAVE</span>C<br><br>C = 2, H = 7, A = 0, V = 21, E = 4</div>
+          </article>
+          <article class="card accent-green">
+            <h3>O detalhe que costuma cair</h3>
+            <p>Na implementação deste projeto, espaços, números e pontuação não são cifrados e <strong>não avançam a posição da chave</strong>. Só as letras A–Z consomem uma letra da palavra-chave.</p>
+            <div class="question-box"><strong>Resposta:</strong> isso evita que um espaço mude o alinhamento da chave com as letras seguintes.</div>
+          </article>
+        </div>
+        <div class="card" style="margin-top:18px">
+          <h3>Por que ela é diferente de César?</h3>
+          <table class="compare">
+            <thead><tr><th>Característica</th><th>César</th><th>Vigenère</th></tr></thead>
+            <tbody>
+              <tr><td>Chave</td><td>Um número</td><td>Uma palavra ou sequência de letras</td></tr>
+              <tr><td>Deslocamento</td><td>Sempre igual</td><td>Varia conforme a letra da chave</td></tr>
+              <tr><td>Efeito</td><td>Mais previsível</td><td>Mais variado, mas ainda fraco para padrões atuais</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="substituicao">
+        <div class="section-kicker">04 · Mapa de letras</div>
+        <h2>Substituição monoalfabética</h2>
+        <div class="grid">
+          <article class="card accent-purple">
+            <h3>Uma tabela fixa</h3>
+            <p>A chave é um alfabeto embaralhado com 26 letras, sem repetição. A primeira letra do alfabeto original corresponde à primeira letra da chave, e assim por diante.</p>
+            <div class="example">Original: A B C D E<br>Chave: &nbsp;&nbsp; Q W E R T<br><br>A → Q &nbsp; B → W &nbsp; C → E</div>
+          </article>
+          <article class="card accent-yellow">
+            <h3>Por que não pode repetir?</h3>
+            <p>Se duas letras originais apontarem para a mesma letra cifrada, a descriptografia ficará ambígua. O programa precisa de uma associação reversível, isto é, uma permutação do alfabeto.</p>
+            <div class="question-box"><strong>Frase boa:</strong> “A chave precisa ser bijetiva: cada letra de origem tem uma imagem única e cada letra cifrada pode voltar para uma única origem.”</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="rail">
+        <div class="section-kicker">05 · Mudança de posição</div>
+        <h2>Transposição Rail Fence</h2>
+        <div class="grid">
+          <article class="card accent-green">
+            <h3>As letras continuam iguais</h3>
+            <p>Ao contrário da substituição, a Rail Fence não troca A por outra letra. Ela escreve a mensagem em zigue-zague e depois lê os trilhos em linhas.</p>
+            <div class="example">Mensagem: ABCDEF · 3 trilhos<br><br>A . . . E<br>. B . D . F<br>. . C . . .<br><br>Cifrado por linhas: <span class="good">AEBDFC</span></div>
+          </article>
+          <article class="card accent-cyan">
+            <h3>Como descriptografar?</h3>
+            <p>Primeiro, o programa descobre em qual trilho cada posição da mensagem original estaria. Depois distribui as letras cifradas nesses trilhos e percorre o zigue-zague para reconstruir a ordem.</p>
+            <div class="question-box"><strong>Pegadinha:</strong> descriptografar não é simplesmente inverter a string. É necessário reconstruir o padrão dos trilhos.</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="perguntas">
+        <div class="section-kicker">06 · Preparação para perguntas individuais</div>
+        <h2>O professor pode perguntar “por quê?”</h2>
+        <div class="card">
+          <div class="step"><div class="number">1</div><div><h3>Por que preservar espaços e pontuação?</h3><p>Para manter a mensagem legível e facilitar a demonstração. O algoritmo transforma somente as letras previstas pelo projeto.</p></div></div>
+          <div class="step"><div class="number">2</div><div><h3>Por que a descriptografia precisa ser a operação inversa?</h3><p>Porque o objetivo é recuperar exatamente o texto claro. Se uma transformação perder informação, não será possível desfazê-la de forma única.</p></div></div>
+          <div class="step"><div class="number">3</div><div><h3>Por que essas cifras não protegem dados reais?</h3><p>Elas possuem padrões simples e chaves pequenas ou estruturas previsíveis. Um atacante pode testar possibilidades ou analisar a frequência das letras.</p></div></div>
+          <div class="step"><div class="number">4</div><div><h3>Qual é a diferença entre cifra e hash?</h3><p>Cifra é reversível com uma chave. Hash normalmente é uma função de mão única usada para verificar integridade ou armazenar senhas com técnicas adequadas.</p></div></div>
+          <div class="step"><div class="number">5</div><div><h3>O que significa “autoral”?</h3><p>Significa que o grupo deve conseguir justificar as decisões da implementação: validação de chave, tratamento de caracteres, cálculo do deslocamento e reconstrução da descriptografia.</p></div></div>
+        </div>
+      </section>
+
+      <section id="bolso">
+        <div class="section-kicker">07 · Revisão de bolso</div>
+        <h2>O que lembrar cinco minutos antes?</h2>
+        <div class="grid">
+          <article class="card accent-yellow">
+            <h3>Mapa mental</h3>
+            <ul class="pocket-list">
+              <li><b>1</b><span><strong>César:</strong> um número, um deslocamento fixo.</span></li>
+              <li><b>2</b><span><strong>Vigenère:</strong> uma palavra, vários deslocamentos.</span></li>
+              <li><b>3</b><span><strong>Substituição:</strong> troca cada letra por outra.</span></li>
+              <li><b>4</b><span><strong>Rail Fence:</strong> mantém as letras e muda a ordem.</span></li>
+              <li><b>5</b><span><strong>Descriptografar:</strong> sempre desfaz a transformação.</span></li>
+            </ul>
+          </article>
+          <article class="card accent-green">
+            <h3>Roteiro de 60 segundos</h3>
+            <p class="presentation-script">“Nosso programa recebe texto e chave, cifra usando quatro técnicas clássicas e depois aplica a operação inversa. César usa deslocamento fixo; Vigenère usa uma chave repetida; substituição usa um alfabeto embaralhado; Rail Fence reorganiza posições em zigue-zague. O módulo 26 resolve a volta do Z para o A. São algoritmos didáticos, não adequados para segurança atual.”</p>
+          </article>
+        </div>
+        <div class="card accent-cyan" style="margin-top:18px">
+          <h3>Estratégia para uma pergunta difícil</h3>
+          <p>Se não lembrar imediatamente, responda em três camadas: <strong>o que a cifra transforma</strong>, <strong>como a chave participa</strong> e <strong>como a operação inversa desfaz</strong>. Isso demonstra raciocínio mesmo quando a pergunta muda o exemplo.</p>
+        </div>
+      </section>
+
+      <section id="quiz">
+        <div class="section-kicker">08 · Jogo de perguntas e respostas</div>
+        <h2>Desafio do professor</h2>
+        <p>São 12 questões. Escolha uma alternativa e leia a explicação. O objetivo não é apenas acertar: é conseguir justificar a resposta em voz alta.</p>
+        <div class="quiz-shell">
+          <div id="quiz-content">
+            <div class="quiz-top"><span id="question-number">Questão 1 de 12</span><span class="score" id="score">Pontos: 0</span></div>
+            <div class="progress"><div id="progress-bar"></div></div>
+            <div id="question-text"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback" aria-live="polite"></div>
+            <button class="next" id="next" disabled>Próxima questão</button>
+          </div>
+          <div id="result" class="hidden"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>Use esta página para estudar. O código da atividade deve ser compreendido e explicado pelo grupo.</footer>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "Na César com chave 3, o que acontece com a letra Y?",
+        a: ["Vira B, porque o alfabeto volta ao início", "Vira Z, porque soma apenas uma posição", "É removida", "Permanece Y"],
+        correct: 0,
+        why: "Y é a posição 24. (24 + 3) mod 26 = 1, que corresponde a B."
+      },
+      {
+        q: "Por que o módulo 26 aparece nas cifras baseadas no alfabeto?",
+        a: ["Para limitar o resultado às 26 letras e dar a volta no alfabeto", "Para criar uma senha de 26 caracteres", "Para apagar espaços", "Para inverter a mensagem"],
+        correct: 0,
+        why: "O módulo mantém o resultado entre 0 e 25, permitindo que depois do Z o cálculo retorne ao A."
+      },
+      {
+        q: "Qual é a principal diferença entre César e Vigenère?",
+        a: ["César usa um deslocamento fixo; Vigenère usa deslocamentos definidos por uma palavra-chave", "César troca a ordem; Vigenère só remove espaços", "Vigenère não possui chave", "Não existe diferença"],
+        correct: 0,
+        why: "A palavra-chave da Vigenère faz o deslocamento variar ao longo da mensagem."
+      },
+      {
+        q: "Na implementação estudada, um espaço na mensagem faz a posição da chave da Vigenère avançar?",
+        a: ["Não, porque somente letras A–Z são processadas", "Sim, sempre", "Somente se a chave tiver números", "Apenas durante a descriptografia"],
+        correct: 0,
+        why: "Espaços, números e pontuação são preservados e não consomem letras da chave."
+      },
+      {
+        q: "Por que a chave da substituição monoalfabética não pode repetir letras?",
+        a: ["Para a associação inversa ser única", "Porque o programa só aceita vogais", "Para tornar a mensagem maior", "Porque repetição sempre causa erro de sintaxe"],
+        correct: 0,
+        why: "Se duas letras originais produzissem o mesmo símbolo, a descriptografia não saberia qual origem escolher."
+      },
+      {
+        q: "O que a Rail Fence modifica principalmente?",
+        a: ["A posição das letras", "O valor de cada letra no alfabeto", "A chave da Vigenère", "O tamanho do alfabeto"],
+        correct: 0,
+        why: "Rail Fence é transposição: as letras são mantidas, mas aparecem em outra ordem."
+      },
+      {
+        q: "Por que descriptografar Rail Fence não é simplesmente inverter o texto?",
+        a: ["Porque é preciso reconstruir os trilhos e o zigue-zague", "Porque ela usa RSA", "Porque todas as letras são substituídas", "Porque não existe chave"],
+        correct: 0,
+        why: "A ordem original depende do padrão de passagem pelos trilhos; inverter a string não recupera esse padrão."
+      },
+      {
+        q: "O que deve acontecer ao criptografar e depois descriptografar com a mesma chave correta?",
+        a: ["O texto original deve ser recuperado", "O texto deve ficar duas vezes maior", "A mensagem deve ser apagada", "A chave deve mudar automaticamente"],
+        correct: 0,
+        why: "A descriptografia é a operação inversa e deve desfazer a transformação."
+      },
+      {
+        q: "Qual alternativa descreve melhor uma cifra?",
+        a: ["Uma transformação reversível usando uma chave", "Um arquivo de imagem", "Uma função que sempre destrói a mensagem", "Um sistema exclusivo para senhas"],
+        correct: 0,
+        why: "Cifras transformam e permitem recuperar o texto quando a chave e o método corretos estão disponíveis."
+      },
+      {
+        q: "Se uma cifra preserva pontuação, isso significa que a pontuação está protegida criptograficamente?",
+        a: ["Não necessariamente; ela pode apenas estar sendo copiada sem alteração", "Sim, sempre", "Sim, porque pontuação tem valor de A a Z", "A pontuação vira uma chave"],
+        correct: 0,
+        why: "Preservar um caractere significa não transformá-lo. Isso é uma decisão de implementação, não uma proteção especial."
+      },
+      {
+        q: "Por que as quatro cifras são consideradas históricas e inadequadas para dados atuais?",
+        a: ["Porque têm padrões e espaços de busca fracos para os padrões modernos", "Porque não usam computadores", "Porque só funcionam em papel", "Porque não podem ser descriptografadas"],
+        correct: 0,
+        why: "Elas são úteis para aprender conceitos, mas análise de frequência e tentativa de chaves podem quebrá-las."
+      },
+      {
+        q: "Se o professor perguntar sobre autoria, qual é a melhor demonstração?",
+        a: ["Explicar as decisões do algoritmo e mostrar um exemplo de entrada, transformação e saída", "Dizer apenas que o programa funciona", "Ler o nome das funções sem explicar", "Falar que toda criptografia é igual"],
+        correct: 0,
+        why: "A apresentação avalia compreensão. Mostre o raciocínio: chave, transformação, inversa e tratamento dos caracteres."
+      }
+    ];
+
+    let current = 0;
+    let points = 0;
+    let answered = false;
+
+    const questionNumber = document.getElementById("question-number");
+    const score = document.getElementById("score");
+    const progressBar = document.getElementById("progress-bar");
+    const questionText = document.getElementById("question-text");
+    const options = document.getElementById("options");
+    const feedback = document.getElementById("feedback");
+    const next = document.getElementById("next");
+    const quizContent = document.getElementById("quiz-content");
+    const result = document.getElementById("result");
+
+    function renderQuestion() {
+      answered = false;
+      const item = questions[current];
+      questionNumber.textContent = `Questão ${current + 1} de ${questions.length}`;
+      score.textContent = `Pontos: ${points}`;
+      progressBar.style.width = `${(current / questions.length) * 100}%`;
+      questionText.textContent = item.q;
+      feedback.textContent = "Escolha uma alternativa e tente justificar sua resposta.";
+      feedback.className = "feedback";
+      options.innerHTML = "";
+      item.a.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.className = "option";
+        button.textContent = `${String.fromCharCode(65 + index)}) ${answer}`;
+        button.addEventListener("click", () => chooseAnswer(index, button));
+        options.appendChild(button);
+      });
+      next.disabled = true;
+      next.textContent = current === questions.length - 1 ? "Ver resultado" : "Próxima questão";
+    }
+
+    function chooseAnswer(index, clicked) {
+      if (answered) return;
+      answered = true;
+      const item = questions[current];
+      document.querySelectorAll(".option").forEach((button, i) => {
+        button.disabled = true;
+        if (i === item.correct) button.classList.add("correct");
+      });
+      if (index === item.correct) {
+        points++;
+        clicked.classList.add("correct");
+        feedback.textContent = `Acertou! ${item.why}`;
+        feedback.className = "feedback ok";
+      } else {
+        clicked.classList.add("wrong");
+        feedback.textContent = `Ainda não. ${item.why}`;
+        feedback.className = "feedback no";
+      }
+      score.textContent = `Pontos: ${points}`;
+      next.disabled = false;
+    }
+
+    next.addEventListener("click", () => {
+      if (!answered) return;
+      current++;
+      if (current < questions.length) renderQuestion();
+      else showResult();
+    });
+
+    function showResult() {
+      progressBar.style.width = "100%";
+      quizContent.classList.add("hidden");
+      result.classList.remove("hidden");
+      let message = points >= 10 ? "Você está pronto para perguntas difíceis." : points >= 7 ? "Você já tem uma boa base; revise os detalhes." : "Volte às seções e tente explicar cada cifra em voz alta.";
+      result.innerHTML = `<h3>${points}/${questions.length} pontos</h3><p>${message}</p><button class="restart" onclick="restartQuiz()">Jogar novamente</button>`;
+    }
+
+    function restartQuiz() {
+      current = 0;
+      points = 0;
+      result.classList.add("hidden");
+      quizContent.classList.remove("hidden");
+      renderQuestion();
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
